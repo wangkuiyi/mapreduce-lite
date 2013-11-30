@@ -55,6 +55,9 @@ In Tencent, we have been using MapReduce Lite with a Tencent's DFS to run jobs l
     };
     REGISTER_BATCH_REDUCER(WordCountBatchReducer);
 
+## Install
+
+Please refer to the [HowToInstall](doc/install.md) document.
 
 ## Updates
 
