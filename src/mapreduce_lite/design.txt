@@ -1,0 +1,155 @@
+mrlite is supposed to be a Python script, which accepts few commands,
+among which, "start" launches a parallel computing job.  For example:
+
+
+$> mrlite start ./wordcount \
+  --mapreduce_map_io="{m1}:WordCountMapper:recordio:/input-000??-*:/data3/map-output;
+                      {m1,m2,m3}:WordCountMapper:text:/data5/text-input-*:/data6/map-output;" \
+  --mapreduce_reduce_io="{m1,m2}:WordCountReducer:recordio:/disk10/reduce-input:/disk7/reduce-output;"
+                         {m2,m3}:IdentityReducer:text:/disk7/reduce-input:/disk7/reduce-output;" \
+  --mapreduce_log_filebase="{m1,m2,m3}/tmp/log" \
+  --mapreduce_tmp_dir="{m1,m2}/disk1/tmp;{m3}/tmp" 
+  --mapreduce_ssh_port=36000 \
+  --mapreduce_buffer_size=1024 \
+  --mapreduce_incremental_reduction
+
+Note:
+  --mapreduce_tmp_dir
+  The temporary directory to store intermediate data, scripts and so on. Including map output files, reduce input files,
+  scripts for controlling and binary program.
+  
+  the syntax '@number' means to duplicate 'number' copies of the task
+
+For map-only mode,
+
+$> mrlite start ./wordcount \
+  --mapreduce_maponly_io="{m1}:WordCountMapper:recordio:/input-000??-*:text:/disk10/output;
+                          {m1,m2}:BigramCountMapper:text:/data5/text-input-*:recordio:/disk7/output;" \
+  --mapreduce_log_filebase="{m1,m2}/tmp/log" \
+  --mapreduce_tmp_dir=/home/mrlite
+  --mapreduce_ssh_port=36000
+
+The above command copies ./wordcount to involved computers and start a
+parallel computing job.  According to --mapreduce_input_map and
+--mapreduce_output_map, involved computers are: m1, m2, m3.
+
+Before starting the job, ``mrlite start'' copies ./wordcount to the
+"/home/mrlite/bin" directory of m1, m2, m3, and rename it as
+"wordcount-<username>-<launch-machine>-<launcher-pid>-<date-time>".
+After the job succeeds, ``mrlite start'' deletes this file on all
+involved computers.
+
+
+--mapreduce_input_map instructs the starting of map workers:
+------------------------------------------------------------------------
+| machine | num workers | input                    | mapper class      |
+------------------------------------------------------------------------
+| m1      | few         | m1:/input-000??-of-00005 | WordCountMapper   |
+| m2      | few         | m2:/input-000??-of-00005 | WordCountMapper   |
+| m3      | few         | m4:/text-*               | BigramCountMapper |
+------------------------------------------------------------------------
+where "few" denotes the number of files on a machine that matches the
+given file pattern.
+
+
+--mapreduce_output_map instructs the starting of reduce workers:
+----------------------------------------------------------------------------------
+| machine | num workers | output                              | reducer class    |
+----------------------------------------------------------------------------------
+| m1      | 1           | m1:/disk10/output-00000-of-00006    | WordCountReducer |
+| m2      | 3           | m2:/disk10/output-00001-of-00006    | WordCountReducer |
+|         |             | m2:/disk7/output-00002-of-00006.txt | IdentityReducer  |
+|         |             | m2:/disk7/output-00003-of-00006.txt | IdentityReducer  |
+| m3      | 2           | m3:/disk7/ouptut-00004-of-00006.txt | IdentityReducer  |
+|         |             | m3:/disk7/ouptut-00005-of-00006.txt | IdentityReducer  |
+----------------------------------------------------------------------------------
+
+
+--mapreduce_reduce_input_buffer instructs the reduce workers to buffer
+  reduce inputs in the following directories:
+-------------------------------------------------------------------------------
+| machine | num workers | reduce input file pattern                           |
+-------------------------------------------------------------------------------
+| m1      | 1           | m1:/disk1/tmp/<...>-00000-of-00006-<yyy>            |
+| m2      | 3           | m2:/disk1/tmp/<...>-00001-of-00006-<yyy>            |
+|         |             | m2:/disk2/<...>-00002-of-00006-<yyy>                |
+|         |             | m2:/disk2/<...>-00003-of-00006-<yyy>                |
+| m3      | 2           | m3:/disk3/<...>-00004-of-00006-<yyy>                |
+|         |             | m3:/disk3/<...>-00005-of-00006-<yyy>                |
+-------------------------------------------------------------------------------
+where <...> has format "<jobname>-<username>-<date-time>-<reduce_worker_pid>",
+and <yyy> denotes a serial number, whose max value depends on the
+total size of map inputs arrived in a reduce worker, as well the
+buffer size of the reduce worker.
+
+It is notable that mapreduce_reduce_input_buffer, if specified, must
+match mapreduce_output_map.  This could be challenging for users.
+However, if users do not want to take care of the fine grained
+control, they can leave mapreduce_reduce_input_buffer unspecified, and
+MapReduce Lite create input buffers in /tmp.
+
+The API supporting multiple reduce outputs is as follows:
+
+MR_Mapper {
+ protected:
+  void Output(key, value);
+  void Output(channel, key, value);
+  int GetChannelNum();
+  void GetChannelName(int channel, string* reduce_class_name);
+};
+
+
+A simpler use case:
+
+mrlite start ./wordcount \
+  --mapreduce_input_map="WordCountMapper{m1,m2}/input*" \
+  --mapreduce_output_map="WordCountReducer{m1,m2}/disk10/output" \
+  --mapreduce_reduce_input_buffer="{m1,m2}/tmp" \
+  --mapreduce_input_format=Text \
+  --mapreduce_output_format=RecordIO \
+
+
+"map_only" mode:
+command to start a mapper in scheduler
+
+$> wordcount \
+  --mr_map_only=true                                          \
+  --mr_input_filepattern={/input-?????-of-00005}              \
+  --mr_output_file=output-00001-of-00006                      \  # for mr_map_only=true
+  --mr_log_filebase=...                                       \
+  --mr_mapper_class=WordCountMapper                           \
+  --mr_input_format=recordio/text                             \
+  --mr_output_format=recordio/text                            \  # for mr_map_only=true
+
+
+"non-map_only" mode:
+command to start a mapper in scheduler
+
+$> wordcount \
+  --mr_input_filepattern={/input-?????-of-00005}              \
+  --mr_reduce_input_filebase=/disk1/tmp/wordcount-user-time     \  # mr_batch_reduction=true
+                                                                 # then the name of buffer files will be: /disk1/tmp/wordcount-user-time-mapper-00002-of-00005-reducer-00000-of-00002-0000000001
+  --mr_reduce_input_buffer_size=64                            \  # in MB
+  --mr_log_filebase=...                                       \
+  --mr_num_map_workers=5                                      \
+  --mr_reduce_workers="m1:7070,m2:7070,m2:7071"               \
+  --mr_map_worker_id=x                                        \
+  --mr_mapper_class=WordCountMapper                           \
+  --mr_input_format=recordio/text                             \
+  --mr_batch_reduction=true                                      # default to "true"
+
+
+command to start a reducer in scheduler
+
+$> wordcount \
+  --mr_output_file=output-00001-of-00006                      \
+  --mr_reduce_input_filebase=...                              \ # for mr_batch_reduction=true
+  --mr_num_reduce_input_buffer_files=11                       \ # for mr_batch_reduction=true
+  --mr_log_filebase=...                                       \
+  --mr_num_map_workers=5                                      \
+  --mr_reduce_workers="m1:7070,m2:7070,m2:7071"               \
+  --mr_reduce_worker_id=y                                     \
+  --mr_reducer_class=WordCountReducer                         \
+  --mr_output_format=recordio                                 \
+  --mr_batch_reduction=true                                     # default to "true"
+

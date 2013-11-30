@@ -1,0 +1,20 @@
+CXX=g++ -Wall -Wno-sign-compare -Werror -O3
+AR=ar rcs
+
+THIRD_PARTY_DIR = ../../thirdparty
+
+PROTOBUF_BASE_DIR = $(THIRD_PARTY_DIR)/protobuf-2.3.0
+PROTOC = $(PROTOBUF_BASE_DIR)/bin/protoc
+PROTOBUF_CXX_FLAGS = -I$(PROTOBUF_BASE_DIR)/include/
+PROTOBUF_LD_FLAGS = -L$(PROTOBUF_BASE_DIR)/lib/ -lprotobuf -lpthread
+
+GFLAGS_BASE_DIR = $(THIRD_PARTY_DIR)/gflags-1.4
+GFLAGS_CXX_FLAGS = -I$(GFLAGS_BASE_DIR)/include/
+GFLAGS_LD_FLAGS = -L$(GFLAGS_BASE_DIR)/lib/ -lgflags
+
+BOOST_BASE_DIR = $(THIRD_PARTY_DIR)/boost-1.43.0
+BOOST_CXX_FLAGS = -I$(BOOST_BASE_DIR)/include/
+BOOST_LD_FLAGS = -L$(BOOST_BASE_DIR)/lib/ -lboost_thread -lboost_system -lboost_filesystem -lpthread
+
+CXXFLAGS= $(PROTOBUF_CXX_FLAGS) $(GFLAGS_CXX_FLAGS) $(BOOST_CXX_FLAGS) -I../include/
+LDFLAGS=-static $(PROTOBUF_LD_FLAGS) $(GFLAGS_LD_FLAGS) $(BOOST_LD_FLAGS)

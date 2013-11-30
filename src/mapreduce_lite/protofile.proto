@@ -1,0 +1,6 @@
+package mapreduce_lite;
+
+message KeyValuePair {
+  optional bytes key = 1;
+  optional bytes value = 2;
+}

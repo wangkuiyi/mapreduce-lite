@@ -1,0 +1,34 @@
+
+#------------------------------
+# Files Description
+#------------------------------
+.
+|-- wordcount.cc               # wordcount example source code
+|-- Makefile                   # makefile for wordcount.cc
+|-- Makefile.rules             # enviroment setting for makefile
+|-- mrl-wordcount              # compiled binary for suse 64bit platform
+|
+|                              # shell scripts for testing Mapreduce-Lite
+|-- wordcount_run_locally.sh   
+|-- wordcount_batch_reduction_mode.sh
+|-- wordcount_incremental_reduction_mode.sh
+|
+|-- testdata                   # testdata for wordcount job
+    |-- text-00000-of-00002
+    `-- text-00001-of-00002
+
+
+#------------------------------
+# Mapreduce-Lite Quick Start
+#------------------------------
+
+1. Read "wordcount_run_locally.sh", this script is used to test Mapreduce-Lite
+in local machine, modify the local IP address if necessary, and run the script.
+
+2. Read "wordcount_incremental_reduction_mode.sh", this script is used to test
+INCREMENTAL reduction mode of Mapreduce-Lite in multiple machines, modify IP
+addresses if necessary. Make sure the testdatas are well prepared in the
+specified directory in all machines, then run the script.
+
+3. Read and run "wordcount_batch_reduction_mode.sh", this script is used to
+test BATCH reduction mode of Mapreduce-Lite in multiple machines

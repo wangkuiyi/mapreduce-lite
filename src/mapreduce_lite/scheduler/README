@@ -1,0 +1,20 @@
+#------------------------------
+# Files Description
+#------------------------------
+.
+|-- README
+|-- mrlite.py               # Mapreduce-Lite scheduler
+|-- mrlite_options.py       # scheduler command line options parser
+|-- mrlite_options_test.py  # unittest for options parser
+|-- worker.py               # script to run map worker or reduce worker
+|-- util.py                 # common utility
+
+
+
+#------------------------------
+# Usage of Mapreduce-Lite scheduler
+#------------------------------
+
+1. Read comments at the head of "mrlite.py"
+2. Read help of "mrlite.py" by running "./mrlite.py -h"
+3. Read documentation of Mapreduce-Lite at "http://paralgo.oa.com/mrlite.xml"
