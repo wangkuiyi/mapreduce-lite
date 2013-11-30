@@ -75,38 +75,58 @@ if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 #------------------------------------------------------------------------------
-# Declare where the third party libraries were installed.
-#------------------------------------------------------------------------------
-set(THIRD_PARTY_DIR "/home/wyi/3rd-party")
-
-#------------------------------------------------------------------------------
-# Declare third party libraries we might need.
-# Add new lines below if you installed more 3rd-party libs.
-#------------------------------------------------------------------------------
-set(BOOST_DIR "${THIRD_PARTY_DIR}/boost")
-set(GFLAGS_DIR "${THIRD_PARTY_DIR}/gflags")
-set(GTEST_DIR "${THIRD_PARTY_DIR}/gtest")
-set(LIBEVENT_DIR "${THIRD_PARTY_DIR}/libevent")
-
-#------------------------------------------------------------------------------
-# Set include paths.
-# Add new lines below if you installed more 3rd-party libs.
-#------------------------------------------------------------------------------
+# Set include paths and library paths.
+#
+# MapReduce Lite depends on the following thirdparty libraries:
+#
+#  - boost
+#  - gflags
+#  - libevent
+#
+# You can install them using package management tools on your system,
+# or build them from source by yourself.  In either way, you need to
+# tell where these libraries were installed.  For example, if you
+# build all libraries and install them to /home/wyi/3rd-party, you
+# might need the following commands:
+#
+#  set(THIRD_PARTY_DIR "/home/wyi/3rd-party")
+#  set(BOOST_DIR "${THIRD_PARTY_DIR}/boost")
+#  set(GFLAGS_DIR "${THIRD_PARTY_DIR}/gflags")
+#  set(LIBEVENT_DIR "${THIRD_PARTY_DIR}/libevent")
+#
+#  include_directories(
+#   "${BOOST_DIR}/include"
+#   "${GFLAGS_DIR}/include"
+#   "${LIBEVENT_DIR}/include"
+#   )
+#
+# link_directories(
+#   "${BOOST_DIR}/lib"
+#   "${GFLAGS_DIR}/lib"
+#   "${LIBEVENT_DIR}/lib"
+#   )
+#
+# On MacOS X, Homebrew installs header files to /usr/local/include and
+# libraries to /usr/local/lib.
+#
+# MapReduce Lite uses googletest framework for unit testing.  As it is
+# not recommended to build googletest as a system-wide library, we
+# must import googletest into our source tree before building
+# MapReduce Lite.
+#
+#  1. Download or checkout googletest code  from code.google.com/p/googletest.
+#  2. Create a symbolic link named `src/gtest` pointing to googletest code.
+# ------------------------------------------------------------------------------
 include_directories(
   "${PROJECT_SOURCE_DIR}"
   "${PROJECT_BINARY_DIR}"
   "${PROTOBUF_INCLUDE_DIRS}"
+  "${PROJECT_SOURCE_DIR}/src/gtest/include"
   "${BOOST_DIR}/include"
   "${GFLAGS_DIR}/include"
-  "${GTEST_DIR}/include"
   "${LIBEVENT_DIR}/include"
   )
 
-#------------------------------------------------------------------------------
-# Set libray paths.
-# Add new lines below if you add new packages in mapreduce-lite project, or
-# installed more 3rd-party libs.
-#------------------------------------------------------------------------------
 link_directories(
   "${PROJECT_BINARY_DIR}/src/base"
   "${PROJECT_BINARY_DIR}/src/strutil"
@@ -121,19 +141,8 @@ link_directories(
 
 #------------------------------------------------------------------------------
 # Declare packages in paralgo project.
-# Add new lines below if you add new packages in mapreduce-lite project.
 #------------------------------------------------------------------------------
-
-# This line works if you install gtest source code using
-# Debian/Ubuntu's package manager (sudo apt-get install libgtest-dev).
-# As this would install the source code of gtest into /usr/src/gtest,
-# and there is a CMakeLists.txt there describing how you can build
-# gtest source code using CMake, we can simply refers to it in our own
-# CMakeLists.txt file.  If you download gtest source file by yourself
-# and to somewhere else than /usr/src/gtest, simply change the
-# directory in the following line.
-add_subdirectory(/usr/src/gtest ${CMAKE_CURRENT_BINARY_DIR}/gtest)
-
+add_subdirectory(src/gtest)
 add_subdirectory(src/base)
 add_subdirectory(src/strutil)
 add_subdirectory(src/hash)
