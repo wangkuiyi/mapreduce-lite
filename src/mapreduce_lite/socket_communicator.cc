@@ -326,7 +326,7 @@ void Connector::Clear() {
 }
 
 int Connector::SendFinal() {
-  uint32 this_send;
+  int this_send;
   message_size_ = 0;
   bytes_count_ = 0;
 
@@ -366,7 +366,7 @@ int Connector::Send() {
   // many byte have been sent each time, and accumulated to
   // bytes_count_.  So, when (bytes_count_ < sizeof(message_size_)),
   // we continue to send message_size_, else, send message_.data()
-  uint32 this_send = 0;
+  int this_send = 0;
   this_send = sock_->Send(message_.data() + bytes_count_,
                           message_.size() - bytes_count_);
   if (this_send < 0) {
@@ -387,7 +387,7 @@ int Connector::Receive() {
   // For each message, receive its size first, then receive its content.
   // Similar with Send(), this_receive is used to record how many bytes have
   // been received this time, and accumulated to bytes_count_.
-  size_t this_receive = 0;
+  int this_receive = 0;
   if (bytes_count_ >= sizeof(message_size_) && message_size_ == 0) {
     return 0;
   } else {
