@@ -105,6 +105,7 @@ However, if you want to use MapReduce on a cluster of computers, you might want 
         ./bootstrap --prefix=/home/you/3rd-party/boost-1_54_0
         ./b2 -j8 # if you want to use default build tool, or
         # ./b2 -j8 toolset=clang
+        ./b2 install
         ln -s /home/you/3rd-party/boost-1_54_0 /home/you/3rd-party/boost
 
 ## Install libevent
