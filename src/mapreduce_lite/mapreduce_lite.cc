@@ -251,7 +251,7 @@ void ReduceOutput(int channel, const string& key, const string& value) {
 // Used by Mapper::Output* if it is not in map-only mode.
 //-----------------------------------------------------------------------------
 void MapOutput(int reduce_worker_id, const string& key, const string& value) {
-  CHECK_LE(0, reduce_worker_id);
+  // CHECK_LE(0, reduce_worker_id);
   CHECK_LT(reduce_worker_id, NumReduceWorkers());
 
   uint32* key_size = reinterpret_cast<uint32*>(GetMapOutputSendBuffer().get());
