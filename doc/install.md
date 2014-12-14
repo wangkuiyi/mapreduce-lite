@@ -107,6 +107,10 @@ However, if you want to use MapReduce on a cluster of computers, you might want 
         # ./b2 -j8 toolset=clang
         ./b2 install
         ln -s /home/you/3rd-party/boost-1_54_0 /home/you/3rd-party/boost
+        
+  NOTE: We use a library named "libboost_thread-mt" in the file "src/mapreudce-lite/CMakeLists.txt",  but on some systems such as ubuntu and Mac OSX,
+  using './b2 -j8' will not generate this library, instead, it will generate the "libboost_thread" by default. If your Linker    shows the error:
+  can not find libboost_thread-mt, you can just modify the file "src/mapreduce-lit/CMakeLists.txt" to use 'boost_thread'. 
 
 ## Install libevent
 
