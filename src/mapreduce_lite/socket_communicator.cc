@@ -366,14 +366,16 @@ int Connector::Send() {
   // many byte have been sent each time, and accumulated to
   // bytes_count_.  So, when (bytes_count_ < sizeof(message_size_)),
   // we continue to send message_size_, else, send message_.data()
-  int this_send = 0;
-  this_send = sock_->Send(message_.data() + bytes_count_,
-                          message_.size() - bytes_count_);
-  if (this_send < 0) {
-    LOG(ERROR) << "Socket send error.";
-    return -1;
+  int this_send;
+  while (bytes_count < sizeof(message_size_)) {
+      this_send = sock_->Send(message_.data() + bytes_count_,
+                              message_.size() - bytes_count_);
+      if (this_send < 0) {
+          LOG(ERROR) << "Socket send error.";
+          return -1;
+      }
+      bytes_count_ += this_send;
   }
-  bytes_count_ += this_send;
 
   // this message complete
   if (bytes_count_ == message_.size()) {
