@@ -279,7 +279,7 @@ void SocketCommunicator::ReceiveLoop(SocketCommunicator *comm) {
   int connection_counter = comm->num_sender_;
   struct event_base *base = event_base_new();
   vector<struct event *> events(comm->num_sender_);
-  vector<struct CallbackArg *> cb_args(comm->num_receiver_);
+  vector<struct CallbackArg *> cb_args(comm->num_sender_);
 
   vector<Connector> connectors;
   connectors.resize(comm->num_sender_);
