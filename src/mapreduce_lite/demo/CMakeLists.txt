@@ -1,6 +1,6 @@
 
 # Build target
-set(LIBS mapreduce_lite sorted_buffer strutil hash base event_core protobuf system gflags boost_thread-mt boost_system boost_filesystem pthread)
+set(LIBS mapreduce_lite sorted_buffer strutil hash base event_core protobuf system gflags boost_thread boost_system boost_filesystem pthread)
 
 add_executable(mrl-wordcount wordcount.cc)
 target_link_libraries(mrl-wordcount ${LIBS})

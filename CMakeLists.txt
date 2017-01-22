@@ -65,7 +65,7 @@ add_definitions(" -Wall -Wno-sign-compare -Werror -O2 ")
 #------------------------------------------------------------------------------
 # Declare where our project will be installed.
 #------------------------------------------------------------------------------
-set(CMAKE_INSTALL_PREFIX "/home/wyi/mapreduce-lite")
+set(CMAKE_INSTALL_PREFIX "/opt/mapreduce-lite")
 
 #------------------------------------------------------------------------------
 # Ensure executables are statically linked with libraries.

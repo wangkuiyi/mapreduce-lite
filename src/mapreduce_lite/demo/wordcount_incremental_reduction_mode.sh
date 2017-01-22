@@ -26,6 +26,6 @@ python ../scheduler/mrlite.py   \
 --mapreduce_tmp_dir="{$m1,$m2}/tmp/mrlite-$USER"          \
 --mapreduce_log_filebase="{$m1,$m2}/tmp/mrlite-$USER/log" \
 --mapreduce_buffer_size=1024                              \
---mapreduce_ssh_port=36000                                \
+--mapreduce_ssh_port=22                                \
 --mapreduce_incremental_mode                              \
 --mapreduce_force_mkdir

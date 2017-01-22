@@ -15,6 +15,7 @@ import socket
 import sys
 import textwrap
 import traceback
+import getpass
 try: # for python version < 3.0
     from ConfigParser import ConfigParser
 except:
@@ -439,7 +440,7 @@ class MRLiteOptionParser(OptionParser):
     def get_identity(self, local_executable):
         """ Get identity of job
         """
-        user = os.environ['USER'] or os.environ['USERNAME']
+        user = getpass.getuser()
         host = socket.gethostname()
         pid  = str(os.getpid())
         time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
