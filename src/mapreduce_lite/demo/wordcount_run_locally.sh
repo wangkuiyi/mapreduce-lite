@@ -15,8 +15,7 @@ script_path=`dirname $script`
 
 testdata=$script_path/testdata
 
-m1=10.1.149.174
-#m1=127.0.0.1
+m1=127.0.0.1
 
 python ../scheduler/mrlite.py   \
 --mapreduce_cmd="mrl-wordcount" \
@@ -26,6 +25,6 @@ python ../scheduler/mrlite.py   \
 --mapreduce_tmp_dir="{$m1}/tmp/mrlite-$USER"          \
 --mapreduce_log_filebase="{$m1}/tmp/mrlite-$USER/log" \
 --mapreduce_buffer_size=1024                          \
---mapreduce_ssh_port=36000                            \
+--mapreduce_ssh_port=22                            \
 --mapreduce_force_mkdir
 
